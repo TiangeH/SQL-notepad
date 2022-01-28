@@ -10,6 +10,10 @@ order by CONVERT(date, po_order_dt,102) desc
 ------------------------------------------------
 #sum and number rounding
 
+SELECT distinct po_vcatNO,hsp_site, po_vn_name, round(sum(cast(po_tot_rcv_up as float)),0.000)po_totalReceiveUnit,round(sum(cast(po_tot_rcv_value as float)),0.00)po_totalReceiveAmount 
+FROM PURCHASING_TABLE_NAME 
+where CONVERT(date, po_order_dt,102) between '2017-06-01' and '2019-05-31' group by po_vcatNO,po_vcatNO,hsp_site, po_vn_name
+
 select po_item_nbr,po_eoc,sum( case when isnumeric(po_tot_rcv_value) =1 then convert(decimal(10,2),po_tot_rcv_value) else 0.00 end),sum( case when isnumeric(po_tot_ord_value) =1 then convert(decimal(10,2),po_tot_ord_value) else 0.00 end)  
 from v_POLandPOH where CONVERT(date, po_order_dt,102) between '2018-01-01' and '2018-12-31' and po_item_nbr in ('123','456',....) and hsp_site='Jupiter' group by po_item_nbr,po_eoc
 ------------------------------------------------
@@ -79,6 +83,7 @@ on a.new_nbr=b.new_nbr and a.dt=b.dt
 
 ------------------------------------------------
 #subquery and union
+#use union to reformat the table and join
 
 SELECT isnull(b.hsp_site,'Not Filled') as hsp_site,a.Hospital_Site, b.vn_name,a.EARTH_Vendor_Name,b.itm_nbr,a.Item_Number, a.[EARTH_Item_Number],b.vn_pri,b.vCatNo,a.[Vendor_Catalogue_No],a.Contract_Number,b.contract_no,b.cost,a.[Price],b.pur_uom,a.[UoP],b.itm_desc, a.[Product_Description], b.vn_nber,a.[EARTH_Vendor_Number], b.vn_name,a.[EARTH_Vendor_Name], b.itm_pkg_str,a.[EARTH_Package_String],  a.[Manufacturer_Catalogue_No], a.[UNSPSC],a.[Price_Eff_Date], a.[Price #] 
 from 
