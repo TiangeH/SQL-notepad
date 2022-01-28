@@ -69,10 +69,13 @@ vn_nbr3 as vn_nber,vn_name3 as vn_name,vCatNo3 as vCatNo,mfr3 as mfr,mfrCatNo3 a
 ------------------------------------------------
 
 #subquery 
+
 select a.*, b.* from 
 	(select CONCAT(hsp_site,po_item_nbr,po_vn_nbr) as new_nbr, max(po_order_dt)as dt from PURCHASING_TABLE_NAME where CONCAT(hsp_site,po_item_nbr,po_vn_nbr) in(
-'MARS_123_MUSK') group by hsp_site,po_item_nbr,po_vn_nbr )a  left join(select CONCAT(hsp_site,po_item_nbr,po_vn_nbr) as new_nbr, max(po_order_dt)as dt, po_vn_nbr,po_uop,po_cost_up,po_itm_pkg_str FROM PURCHASING_TABLE_NAME where CONCAT(hsp_site,po_item_nbr,po_vn_nbr) in(
-'MARS_123_MUSK') group by hsp_site,po_item_nbr,po_vn_nbr,po_vn_nbr,po_uop,po_cost_up,po_itm_pkg_str) b on a.new_nbr=b.new_nbr and a.dt=b.dt
+	'MARS_123_MUSK',....) group by hsp_site,po_item_nbr,po_vn_nbr )a  
+	left join (select CONCAT(hsp_site,po_item_nbr,po_vn_nbr) as new_nbr, max(po_order_dt)as dt, po_vn_nbr,po_uop,po_cost_up,po_itm_pkg_str FROM PURCHASING_TABLE_NAME where CONCAT(hsp_site,po_item_nbr,po_vn_nbr) in(
+	'MARS_123_MUSK',....) group by hsp_site,po_item_nbr,po_vn_nbr,po_vn_nbr,po_uop,po_cost_up,po_itm_pkg_str) b 
+on a.new_nbr=b.new_nbr and a.dt=b.dt
 
 ------------------------------------------------
 #subquery and union
