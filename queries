@@ -1,3 +1,216 @@
+#convert varchar to date in SQL
+SELECT * from TABLE where COLUMN_DATE in (cast(DATE as date) ) and COLUMN_DATE between 'YYYY-MM-DD' and 'YYYY-MM-DD' and table_site='test_site' and table_vn_name like  '%Spectrum%' and is_current='y'
+
+#convert text to date and number
+select distinct purchase_order_dt,
+CONVERT(date, purchase_order_dt,102) as NewDate
+FROM PURCHASING_TABLE_NAME 
+where CONVERT(date, po_order_dt,102) between '2018-01-01' and convert(date,GETDATE(),102)
+order by CONVERT(date, po_order_dt,102) desc
+
+select po_item_nbr,po_eoc,sum( case when isnumeric(po_tot_rcv_value) =1 then convert(decimal(10,2),po_tot_rcv_value) else 0.00 end),sum( case when isnumeric(po_tot_ord_value) =1 then convert(decimal(10,2),po_tot_ord_value) else 0.00 end)  
+from v_POLandPOH where CONVERT(date, po_order_dt,102) between '2018-01-01' and '2018-12-31' and po_item_nbr in ('9421520') and hsp_site='hhs' group by po_item_nbr,po_eoc
+
+#check most recent with frequency
+
+select a.*, b.* from (select po_cost_up, CONCAT(hsp_site,po_item_nbr,po_vn_nbr) as new_nbr from PURCHASING_TABLE_NAME a 
+  right join(select hsp_site,po_item_nbr,po_vn_nbr,CONCAT(hsp_site,po_item_nbr,po_vn_nbr) as new_nbr, max(po_order_dt)as dt FROM PURCHASING_TABLE_NAME where po_item_nbr in ('025861') and hsp_site='cvh' group by hsp_site,po_item_nbr,po_vn_nbr) b on a.new_nbr=b.new_nbr
+
+   select a.*, b.* from (select po_cost_up, CONCAT(hsp_site,po_item_nbr,po_vn_nbr) as new_nbr from PURCHASING_TABLE_NAME) a 
+  inner join(select hsp_site,po_item_nbr,po_vn_nbr,CONCAT(hsp_site,po_item_nbr,po_vn_nbr) as new_nbr, max(po_order_dt)as dt FROM PURCHASING_TABLE_NAME where CONCAT(hsp_site,po_item_nbr,po_vn_nbr) in ('CVH01307300216') group by hsp_site,po_item_nbr,po_vn_nbr) b on a.new_nbr=b.new_nbr 
+
+ 
+
+select * from PURCHASING_TABLE_NAME WHERE PO_ITEM_NBR='072472' and hsp_site='TMQ' and po_vn_nbr='00042' order by po_order_dt desc
+
+
+***new one***
+select CONCAT(hsp_site,po_item_nbr,po_vn_nbr) as new_nbr, max(po_order_dt)as dt, po_vn_nbr,po_uop,po_itm_pkg_str FROM PURCHASING_TABLE_NAME where CONCAT(hsp_site,po_item_nbr,po_vn_nbr) in('CVH01307300216',
+'CVH06290100216',
+'TMQ07156400597',
+'CVH07415900020',
+'TMQ07169100209') group by hsp_site,po_item_nbr,po_vn_nbr,po_vn_nbr,po_uop,po_itm_pkg_str
+
+select a.*, b.* from (select CONCAT(hsp_site,po_item_nbr,po_vn_nbr) as new_nbr, max(po_order_dt)as dt from PURCHASING_TABLE_NAME where CONCAT(hsp_site,po_item_nbr,po_vn_nbr) in(
+'TMQ07169100209') group by hsp_site,po_item_nbr,po_vn_nbr )a  left join(select CONCAT(hsp_site,po_item_nbr,po_vn_nbr) as new_nbr, max(po_order_dt)as dt, po_vn_nbr,po_uop,po_cost_up,po_itm_pkg_str FROM PURCHASING_TABLE_NAME where CONCAT(hsp_site,po_item_nbr,po_vn_nbr) in(
+'TMQ07169100209') group by hsp_site,po_item_nbr,po_vn_nbr,po_vn_nbr,po_uop,po_cost_up,po_itm_pkg_str) b on a.new_nbr=b.new_nbr and a.dt=b.dt
+
+
+
+
+
+
+
+
+
+#create temp table
+
+SELECT CONCAT('tmq',po_item_nbr,' ','tmq',po_vn_nbr) AS mergedColumns
+INTO #temppp_tmq
+FROM PURCHASING_TABLE_NAME where DATEDIFF(month, po_order_dt, GETDATE()) < 24 and hsp_site='TMQ' and po_item_nbr in ('00000')
+
+SELECT COUNT(1) AS NumberOfRows,
+   mergedColumns
+FROM #temppp_cvh
+GROUP BY mergedColumns order by NumberOfRows desc
+
+#concat and convert time
+
+select P.*,PL.*
+from v_MM_PO_PoLines PL
+left join v_MM_PO_Po P on PL.po_urn = P.po_urn
+and PL.hsp_site = P.hsp_site
+where PL.po_vcatno in ('333512')
+and pl.hsp_site = 'cvh'
+--and po_vn_name like '%covidien%'
+and CONVERT(date, po_order_dt,102) between '2018-04-01' and '2019-03-31' order by po_order_dt desc
+
+#subquery and union
+
+use DATABASE NAME
+
+SELECT isnull(b.hsp_site,'Not Filled') as hsp_site,a.Hospital_Site, 
+b.vn_name,a.SSW_Vendor_Name,
+b.itm_nbr,a.Item_Number, a.[SSW_Item_Number],
+b.vn_pri,
+b.vCatNo,a.[Vendor_Catalogue_No],a.Contract_Number,b.contract_no,
+b.cost,a.[Price],
+b.pur_uom,a.[UoP],
+b.itm_desc, a.[Product_Description], 
+b.vn_nber,a.[SSW_Vendor_Number], 
+b.vn_name,a.[SSW_Vendor_Name],  
+b.itm_pkg_str,a.[SSW_Package_String],  
+a.[Manufacturer_Catalogue_No], a.[UNSPSC],a.[Price_Eff_Date], a.[Price #] from 
+
+(SELECT [Contract_Number],[Hospital_Site], [SSW_Item_Number], [Product_Description], [SSW_Vendor_Number], [SSW_Vendor_Name], [Vendor_Catalogue_No], [SSW_Package_String], [SSW_UoP], [Item_Description], [Vendor_Name], [Vendor_Product_Catalogue_no], 
+       [Manufacturer_Catalogue_No], [Package_String], [UoP], [UNSPSC], [Item_Number], [Vendor_Number], [Price], [Price_Eff_Date], [Price #] FROM (
+       SELECT 
+       [Contract_Number],[Hospital_Site], [SSW_Item_Number], [Product_Description], [SSW_Vendor_Number], [SSW_Vendor_Name], [Vendor_Catalogue_No], [SSW_Manufacturer_Name],
+       [SSW_Manufacturer_Catalogue_No], [SSW_Package_String], [SSW_UoP], [Item_Description], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
+       [Manufacturer_Catalogue_No], [Package_String], [UoP], [UNSPSC], [Item_Number], [Vendor_Number], [Price_UoP] AS [Price], NULL [Price_Eff_Date], 1 [Price #]
+       FROM PRODUCT_TABLE_NAME
+       
+       UNION ALL
+       SELECT 
+       [Contract_Number],[Hospital_Site], [SSW_Item_Number], [Product_Description], [SSW_Vendor_Number], [SSW_Vendor_Name], [Vendor_Catalogue_No], [SSW_Manufacturer_Name],
+       [SSW_Manufacturer_Catalogue_No], [SSW_Package_String], [SSW_UoP], [Item_Description], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
+       [Manufacturer_Catalogue_No], [Package_String], [UoP], [UNSPSC], [Item_Number], [Vendor_Number], [Price2], [Price2_Eff_Date], 2 [Price #]
+       FROM PRODUCT_TABLE_NAME
+
+       UNION ALL
+       SELECT 
+       [Contract_Number],[Hospital_Site], [SSW_Item_Number], [Product_Description], [SSW_Vendor_Number], [SSW_Vendor_Name], [Vendor_Catalogue_No], [SSW_Manufacturer_Name],
+       [SSW_Manufacturer_Catalogue_No], [SSW_Package_String], [SSW_UoP], [Item_Description], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
+       [Manufacturer_Catalogue_No], [Package_String], [UoP], [UNSPSC], [Item_Number], [Vendor_Number], [Price3], [Price3_Eff_Date], 3 [Price #]
+       FROM PRODUCT_TABLE_NAME
+
+       UNION ALL
+       SELECT 
+       [Contract_Number],[Hospital_Site], [SSW_Item_Number], [Product_Description], [SSW_Vendor_Number], [SSW_Vendor_Name], [Vendor_Catalogue_No], [SSW_Manufacturer_Name],
+       [SSW_Manufacturer_Catalogue_No], [SSW_Package_String], [SSW_UoP], [Item_Description], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
+       [Manufacturer_Catalogue_No], [Package_String], [UoP], [UNSPSC], [Item_Number], [Vendor_Number], [Price4], [Price4_Eff_Date], 4 [Price #]
+       FROM PRODUCT_TABLE_NAME
+
+       UNION ALL
+       SELECT 
+       [Contract_Number],[Hospital_Site], [SSW_Item_Number], [Product_Description], [SSW_Vendor_Number], [SSW_Vendor_Name], [Vendor_Catalogue_No], [SSW_Manufacturer_Name],
+       [SSW_Manufacturer_Catalogue_No], [SSW_Package_String], [SSW_UoP], [Item_Description], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
+       [Manufacturer_Catalogue_No], [Package_String], [UoP], [UNSPSC], [Item_Number], [Vendor_Number], [Price5], [Price5_Eff_Date], 5 [Price #]
+       FROM PRODUCT_TABLE_NAME
+
+       UNION ALL
+       SELECT 
+       [Contract_Number],[Hospital_Site], [SSW_Item_Number], [Product_Description], [SSW_Vendor_Number], [SSW_Vendor_Name], [Vendor_Catalogue_No], [SSW_Manufacturer_Name],
+       [SSW_Manufacturer_Catalogue_No], [SSW_Package_String], [SSW_UoP], [Item_Description], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
+       [Manufacturer_Catalogue_No], [Package_String], [UoP], [UNSPSC], [Item_Number], [Vendor_Number], [Price6], [Price6_Eff_Date], 6 [Price #]
+       FROM PRODUCT_TABLE_NAME
+
+       UNION ALL
+       SELECT 
+       [Contract_Number],[Hospital_Site], [SSW_Item_Number], [Product_Description], [SSW_Vendor_Number], [SSW_Vendor_Name], [Vendor_Catalogue_No], [SSW_Manufacturer_Name],
+       [SSW_Manufacturer_Catalogue_No], [SSW_Package_String], [SSW_UoP], [Item_Description], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
+       [Manufacturer_Catalogue_No], [Package_String], [UoP], [UNSPSC], [Item_Number], [Vendor_Number], [Price7], [Price7_Eff_Date], 7 [Price #]
+       FROM PRODUCT_TABLE_NAME
+       
+       UNION ALL
+       SELECT 
+       [Contract_Number],[Hospital_Site], [SSW_Item_Number], [Product_Description], [SSW_Vendor_Number], [SSW_Vendor_Name], [Vendor_Catalogue_No], [SSW_Manufacturer_Name],
+       [SSW_Manufacturer_Catalogue_No], [SSW_Package_String], [SSW_UoP], [Item_Description], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
+       [Manufacturer_Catalogue_No], [Package_String], [UoP], [UNSPSC], [Item_Number], [Vendor_Number], [Price8], [Price8_Eff_Date], 8 [Price #]
+       FROM PRODUCT_TABLE_NAME
+
+       UNION ALL
+       SELECT 
+       [Contract_Number],[Hospital_Site], [SSW_Item_Number], [Product_Description], [SSW_Vendor_Number], [SSW_Vendor_Name], [Vendor_Catalogue_No], [SSW_Manufacturer_Name],
+       [SSW_Manufacturer_Catalogue_No], [SSW_Package_String], [SSW_UoP], [Item_Description], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
+       [Manufacturer_Catalogue_No], [Package_String], [UoP], [UNSPSC], [Item_Number], [Vendor_Number], [Price9], [Price9_Eff_Date], 9 [Price #]
+       FROM PRODUCT_TABLE_NAME
+
+       UNION ALL
+       SELECT 
+       [Contract_Number],[Hospital_Site], [SSW_Item_Number], [Product_Description], [SSW_Vendor_Number], [SSW_Vendor_Name], [Vendor_Catalogue_No], [SSW_Manufacturer_Name],
+       [SSW_Manufacturer_Catalogue_No], [SSW_Package_String], [SSW_UoP], [Item_Description], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
+       [Manufacturer_Catalogue_No], [Package_String], [UoP], [UNSPSC], [Item_Number], [Vendor_Number], [Price10], [Price10_Eff_Date], 10 [Price #]
+       FROM PRODUCT_TABLE_NAME z
+
+WHERE [Price] IS NOT NULL ) a left join (SELECT 
+       hsp_cd,	hsp_site,	itm_urn,	itm_nbr,	itm_active,	itm_abc_status,	itm_desc,	itm_desc2,	itm_cmn_name,	itm_cat,	eoc,	eoc_desc,	itm_crn_pkging,	itm_lrg_cmn_unit,	itm_lrg_cmn_uom,	itm_sml_uom,	itm_pkg_str,
+vn_nbr1 as vn_nber,vn_name1 as vn_name,vCatNo1 as vCatNo,mfr1 as mfr,mfrCatNo1 as mfrCatNo,	pur_uom1 as pur_uom,	vu_cost1 as cost,	vn_contract_no1 as contract_no,	vn_cont_exp_date1 as contract_exp_date,
+ 1 [vn_pri] 
+       FROM ITEM_TABLE_NAME where is_current='y' and itm_active='y' 
+
+       UNION ALL
+       SELECT 
+       hsp_cd,	hsp_site,	itm_urn,	itm_nbr,	itm_active,	itm_abc_status,	itm_desc,	itm_desc2,	itm_cmn_name,	itm_cat,	eoc,	eoc_desc,	itm_crn_pkging,	itm_lrg_cmn_unit,	itm_lrg_cmn_uom,	itm_sml_uom,	itm_pkg_str,
+vn_nbr2,	vn_name2,	vCatNo2,	mfr2,	mfrCatNo2,	pur_uom2,	vu_cost2,	vn_contract_no2,	vn_cont_exp_date2,
+ 2 [vn_pri]
+       FROM ITEM_TABLE_NAME where is_current='y' and itm_active='y' 
+
+       UNION ALL
+       SELECT 
+        hsp_cd,	hsp_site,	itm_urn,	itm_nbr,	itm_active,	itm_abc_status,	itm_desc,	itm_desc2,	itm_cmn_name,	itm_cat,	eoc,	eoc_desc,	itm_crn_pkging,	itm_lrg_cmn_unit,	itm_lrg_cmn_uom,	itm_sml_uom,	itm_pkg_str,
+vn_nbr3,	vn_name3,	vCatNo3,	mfr3,	mfrCatNo3,	pur_uom3,	vu_cost3,	vn_contract_no3,	vn_cont_exp_date3,
+ 3 [vn_pri]
+       FROM ITEM_TABLE_NAME where is_current='y' and itm_active='y') b ON b.vCatNo = a.[Vendor_Catalogue_No] and b.hsp_site=a.Hospital_Site and b.vn_nber=a.SSW_Vendor_Number
+
+
+
+select distinct a.hsp_site, a.po_urn,a.po_status,a.po_vn_nbr,a.po_vn_name,a.po_order_dt,b.po_item_nbr,b.po_vcatNO,b.po_qty_up,b.po_consignment_order, b.po_uop,b.po_itm_pkg_str, b.po_cost_up,b.po_tot_ord_value, b.po_tot_rcv_up, b.po_tot_rcv_us,b.po_eoc, b.po_tot_rcv_value from 
+                       (select po_cost_up, po_urn,po_item_nbr,po_tot_ord_value, po_eoc,po_vcatNO,po_qty_up, po_uop,po_itm_pkg_str,po_consignment_order,po_tot_rcv_up,po_tot_rcv_us, po_tot_rcv_value from MM_PO_PoLines 
+	where po_item_nbr in ('5000341','9038449','9402858','9409188') and Is_Current = 'Y' 
+	and hsp_site = 'hhs') b left join 
+    MM_PO_po a on a.po_urn = b.po_urn and Is_Current = 'Y' 
+	and hsp_site = 'hhs' order by po_order_dt desc
+	select* from MM_ITEM_FAC_ITEM where itm_nbr='083913' and hsp_site='tmq' and is_current='y'
+	select po_vcatNO,po_mfr,po_mfrcatno,po_itm_desc,po_itm_pkg_str,po_qty_up,po_cost_up from MM_PO_PoLines where po_urn= '474211' and hsp_site='TMQ'and Is_Current = 'Y'
+
+	select * from MIS_VEN_Vendor where vn_name like '%ZIMMER%' and is_current='y' and hsp_site='TMQ'
+
+
+#union tables
+
+select hsp_site, itm_nbr,itm_abc_status,vn_nber from (SELECT 
+       hsp_cd,	hsp_site,	itm_urn,	itm_nbr,	itm_active,	itm_abc_status,	itm_desc,	itm_desc2,	itm_cmn_name,	itm_cat,	eoc,	eoc_desc,	itm_crn_pkging,	itm_lrg_cmn_unit,	itm_lrg_cmn_uom,	itm_sml_uom,	itm_pkg_str,
+vn_nbr1 as vn_nber,vn_name1 as vn_name,vCatNo1 as vCatNo,mfr1 as mfr,mfrCatNo1 as mfrCatNo,	pur_uom1 as pur_uom,	vu_cost1 as cost,	vn_contract_no1 as contract_no,	vn_cont_exp_date1 as contract_exp_date,
+ 1 [vn_pri] 
+       FROM [SSW_DMI_NPR_HIST].[dbo].[v_MM_ITEM_FAC_ITEM]where is_current='y' and itm_active='y' 
+
+       UNION ALL
+       SELECT 
+       hsp_cd,	hsp_site,	itm_urn,	itm_nbr,	itm_active,	itm_abc_status,	itm_desc,	itm_desc2,	itm_cmn_name,	itm_cat,	eoc,	eoc_desc,	itm_crn_pkging,	itm_lrg_cmn_unit,	itm_lrg_cmn_uom,	itm_sml_uom,	itm_pkg_str,
+vn_nbr2 as vn_nber,vn_name2 as vn_name,vCatNo2 as vCatNo,mfr2 as mfr,mfrCatNo2 as mfrCatNo,	pur_uom2 as pur_uom,	vu_cost2 as cost,	vn_contract_no2 as contract_no,	vn_cont_exp_date2 as contract_exp_date,
+ 2 [vn_pri]
+       FROM [SSW_DMI_NPR_HIST].[dbo].[v_MM_ITEM_FAC_ITEM]where is_current='y' and itm_active='y' 
+
+       UNION ALL
+       SELECT 
+        hsp_cd,	hsp_site,	itm_urn,	itm_nbr,	itm_active,	itm_abc_status,	itm_desc,	itm_desc2,	itm_cmn_name,	itm_cat,	eoc,	eoc_desc,	itm_crn_pkging,	itm_lrg_cmn_unit,	itm_lrg_cmn_uom,	itm_sml_uom,	itm_pkg_str,
+vn_nbr3 as vn_nber,vn_name3 as vn_name,vCatNo3 as vCatNo,mfr3 as mfr,mfrCatNo3 as mfrCatNo,	pur_uom3 as pur_uom,	vu_cost3 as cost,	vn_contract_no3 as contract_no,	vn_cont_exp_date3 as contract_exp_date,
+ 3 [vn_pri]
+       FROM [SSW_DMI_NPR_HIST].[dbo].[v_MM_ITEM_FAC_ITEM] where is_current='y' and itm_active='y') b where b.hsp_site='CVH' and b.vn_nber in ('28344')
+
+
+
 #connect SQL with R
 
 check driver name
@@ -229,3 +442,14 @@ vn_nbr2 as vn_nber,vn_name2 as vn_name,vCatNo2 as vCatNo,mfr2 as mfr,mfrCatNo2 a
 vn_nbr3 as vn_nber,vn_name3 as vn_name,vCatNo3 as vCatNo,mfr3 as mfr,mfrCatNo3 as mfrCatNo,	pur_uom3 as pur_uom,	vu_cost3 as cost,	vn_contract_no3 as contract_no,	vn_cont_exp_date3 as contract_exp_date,
  3 [vn_pri]
        FROM [SSW_DMI_NPR_HIST].[dbo].[v_MM_ITEM_FAC_ITEM] where is_current='y' and itm_active='y') b where b.hsp_site='CVH' and b.vn_nber in ('28344')
+       
+       
+       
+  #connect SQL with R
+
+check driver name
+control panel--> administrative tools-->Data Sources(ODBC)-->Drivers
+
+library("ROBDC")
+conn <- odbcDriverConnect('driver={_______};server=______;database=________;trusted_connection=Yes;')
+test1<-sqlQuery(conn,"select * from table where condition1 and condition2;")
