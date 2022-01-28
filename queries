@@ -1,9 +1,9 @@
 #convert varchar to date in SQL
-SELECT * from MM_PO_Po where po_order_dt in (cast(po_order_dt as date) ) and po_order_dt between '2018-01-01' and '2018-12-31' and hsp_site='HHS' and po_vn_name like  '%Spectrum%' and is_current='y'
+SELECT * from MED_PURCHASE_ORDER where po_order_dt in (cast(po_order_dt as date) ) and po_order_dt between '2018-01-01' and '2018-12-31' and hsp_site='MARS' and po_vn_name like  '%EARTH INC%' and is_current='y'
 ------------------------------------------------
 #convert text to date and number
 select distinct purchase_order_dt,
-CONVERT(date, purchase_order_dt,102) as NewDate
+CONVERT(date, po_order_dt,102) as NewDate
 FROM PURCHASING_TABLE_NAME 
 where CONVERT(date, po_order_dt,102) between '2018-01-01' and convert(date,GETDATE(),102)
 order by CONVERT(date, po_order_dt,102) desc
