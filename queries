@@ -135,8 +135,8 @@ check driver name
 control panel--> administrative tools-->Data Sources(ODBC)-->Drivers
 
 library("ROBDC")
-conn <- odbcDriverConnect('driver={SQL Server Native Client 11.0};server=ssw-med-01;database=SSW_DMI_NPR_HIST;trusted_connection=Yes;')
-test1<-sqlQuery(conn,"select * from MM_PO_PoLines where po_item_nbr = '063838' and po_urn='365367;")
+conn <- odbcDriverConnect('driver={SQL Server Native Client #};server=___;database=____;trusted_connection=Yes;')
+
 
 
  
