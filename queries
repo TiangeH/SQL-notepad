@@ -82,53 +82,7 @@ select a.*, b.* from
 on a.new_nbr=b.new_nbr and a.dt=b.dt
 
 ------------------------------------------------
-#subquery and union
-#use union to reformat the table and join
 
-SELECT isnull(b.hsp_site,'Not Filled') as hsp_site,a.Hospital_Site, b.vn_name,a.EARTH_Vendor_Name,b.itm_nbr,a.Item_Number, a.[EARTH_Item_Number],b.vn_pri,b.vCatNo,a.[Vendor_Catalogue_No],a.Contract_Number,b.contract_no,b.cost,a.[Price],b.pur_uom,a.[UoP],b.itm_desc, a.[Product_Description], b.vn_nber,a.[EARTH_Vendor_Number], b.vn_name,a.[EARTH_Vendor_Name], b.itm_pkg_str,a.[EARTH_Package_String],  a.[Manufacturer_Catalogue_No], a.[UNSPSC],a.[Price_Eff_Date], a.[Price #] 
-from 
-
-	(SELECT [Contract_Number],[Hospital_Site], [EARTH_Item_Number], [Product_Description], [EARTH_Vendor_Number], [EARTH_Vendor_Name], [Vendor_Catalogue_No],[Item_Number], [Vendor_Number], [Price], [Price_Eff_Date], [Price #] FROM (
-	       SELECT 
-	       [Contract_Number],[Hospital_Site], [EARTH_Item_Number], [Product_Description], [EARTH_Vendor_Number], [EARTH_Vendor_Name], [Vendor_Catalogue_No], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
-	       [Manufacturer_Catalogue_No], [Package_String], [Item_Number], [Vendor_Number], [Price_UoP] AS [Price], NULL [Price_Eff_Date], 1 [Price #]
-	       FROM PRODUCT_TABLE
-
-	       UNION ALL
-	       SELECT 
-	       [Contract_Number],[Hospital_Site], [EARTH_Item_Number], [Product_Description], [EARTH_Vendor_Number], [EARTH_Vendor_Name], [Vendor_Catalogue_No], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
-	       [Manufacturer_Catalogue_No], [Package_String], [Item_Number], [Vendor_Number], [Price2], [Price2_Eff_Date], 2 [Price #]
-	       FROM PRODUCT_TABLE
-
-	       UNION ALL
-	       SELECT 
-	       [Contract_Number],[Hospital_Site], [EARTH_Item_Number], [Product_Description], [EARTH_Vendor_Number], [EARTH_Vendor_Name], [Vendor_Catalogue_No], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
-	       [Manufacturer_Catalogue_No], [Package_String], [Item_Number], [Vendor_Number], [Price3], [Price3_Eff_Date], 3 [Price #]
-	       FROM PRODUCT_TABLE
-
-	       UNION ALL
-	       SELECT 
-	       [Contract_Number],[Hospital_Site], [EARTH_Item_Number], [Product_Description], [EARTH_Vendor_Number], [EARTH_Vendor_Name], [Vendor_Catalogue_No], [Vendor_Name], [Vendor_Product_Catalogue_no], [Manufacturer_Name], 
-	       [Manufacturer_Catalogue_No], [Package_String], [Item_Number], [Vendor_Number], [Price4], [Price4_Eff_Date], 4 [Price #]	       
-	       FROM PRODUCT_TABLE) z 
-	       WHERE [Price] IS NOT NULL ) a 
-	
-	left join (
-	SELECT hsp_site,itm_nbr, itm_active,itm_desc,itm_pkg_str,
-	vn_nbr1 as vn_nber,vn_name1 as vn_name,vCatNo1 as vCatNo,mfr1 as mfr,mfrCatNo1 as mfrCatNo, pur_uom1 as pur_uom, vu_cost1 as cost, vn_contract_no1 as contract_no, vn_cont_exp_date1 as contract_exp_date,
-	 1 [vn_pri] FROM ITEM_DICT where is_current='y' and itm_active='y' 
-
-	 UNION ALL
-	 SELECT hsp_site,itm_nbr, itm_active,itm_desc,itm_pkg_str,vn_nbr2,vn_name2,vCatNo2,mfr2,mfrCatNo2,pur_uom2,vu_cost2,vn_contract_no2,vn_cont_exp_date2,2 [vn_pri]
-	 FROM ITEM_DICT where is_current='y' and itm_active='y' 
-
-	 UNION ALL
-	 SELECT hsp_site,itm_nbr, itm_active,itm_desc,itm_pkg_str,vn_nbr3,vn_name3,vCatNo3,mfr3,mfrCatNo3,pur_uom3,vu_cost3,vn_contract_no3,vn_cont_exp_date3,3 [vn_pri]
-	 FROM ITEM_DICT where is_current='y' and itm_active='y') b 
-
-ON b.vCatNo = a.[Vendor_Catalogue_No] and b.hsp_site=a.Hospital_Site and b.vn_nber=a.SSW_Vendor_Number
-
-------------------------------------------------
 #connect SQL with R
 
 check driver name
