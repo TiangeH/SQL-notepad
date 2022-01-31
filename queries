@@ -53,21 +53,21 @@ and CONVERT(date, po_order_dt,102) between '2018-04-01' and '2019-03-31' order b
 
 select hsp_site, itm_nbr,itm_abc_status,vn_nber from (SELECT 
        hsp_site,itm_nbr,itm_active,itm_desc,itm_cmn_name,itm_cat,itm_pkg_str,
-vn_nbr1 as vn_nber,vn_name1 as vn_name,vCatNo1 as vCatNo,mfr1 as mfr,mfrCatNo1 as mfrCatNo,	pur_uom1 as pur_uom,	vu_cost1 as cost,	vn_contract_no1 as contract_no,	vn_cont_exp_date1 as contract_exp_date,
+ven_nbr1 as vn_nber,ven_name1 as vn_name,vCatNo1 as vCatNo,mfr1 as mfr,mfrCatNo1 as mfrCatNo,	uom1 as uom,	cost1 as cost,	contract_no1 as contract_no,	cont_exp_date1 as contract_exp_date,
  1 [vn_pri] 
        FROM ITEM_DICT where is_current='y' and itm_active='y' 
 
        UNION ALL
        SELECT 
        hsp_site,itm_nbr,itm_active,itm_desc,itm_cmn_name,itm_cat,itm_pkg_str,
-vn_nbr2 as vn_nber,vn_name2 as vn_name,vCatNo2 as vCatNo,mfr2 as mfr,mfrCatNo2 as mfrCatNo,	pur_uom2 as pur_uom,	vu_cost2 as cost,	vn_contract_no2 as contract_no,	vn_cont_exp_date2 as contract_exp_date,
+ven_nbr2 as vn_nber,ven_name2 as vn_name,vCatNo2 as vCatNo,mfr2 as mfr,mfrCatNo2 as mfrCatNo,	uom2 as uom,	cost2 as cost,	contract_no2 as contract_no,	cont_exp_date2 as contract_exp_date,
  2 [vn_pri]
        FROM ITEM_DICT where is_current='y' and itm_active='y' 
 
        UNION ALL
        SELECT 
        hsp_site,itm_nbr,itm_active,itm_desc,itm_cmn_name,itm_cat,itm_pkg_str,
-vn_nbr3 as vn_nber,vn_name3 as vn_name,vCatNo3 as vCatNo,mfr3 as mfr,mfrCatNo3 as mfrCatNo,	pur_uom3 as pur_uom,	vu_cost3 as cost,	vn_contract_no3 as contract_no,	vn_cont_exp_date3 as contract_exp_date,
+ven_nbr3 as vn_nber,ven_name3 as vn_name,vCatNo3 as vCatNo,mfr3 as mfr,mfrCatNo3 as mfrCatNo,	uom3 as uom,	cost3 as cost,	contract_no3 as contract_no,	cont_exp_date3 as contract_exp_date,
  3 [vn_pri]
        FROM ITEM_DICT where is_current='y' and itm_active='y') b where b.hsp_site='EARTH' and b.vn_nber in ('28344')
 ------------------------------------------------
